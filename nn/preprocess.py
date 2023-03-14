@@ -2,6 +2,7 @@
 import numpy as np
 from typing import List, Tuple
 from numpy.typing import ArrayLike
+from collections import Counter
 
 def sample_seqs(seqs: List[str], labels: List[bool]) -> Tuple[List[str], List[bool]]:
     """
@@ -20,7 +21,29 @@ def sample_seqs(seqs: List[str], labels: List[bool]) -> Tuple[List[str], List[bo
         sampled_labels: List[bool]
             List of labels for the sampled sequences
     """
-    pass
+    assert len(set(labels)) == 2
+
+
+    a = max(labels,key=labels.count)
+    b = min(labels,key=labels.count)
+    a_counts, b_counts = labels.count(a), labels.count(b)
+
+    seqs = np.array(seqs)
+    labels = np.array(labels)
+    a_seqs = seqs[labels == a]
+    b_seqs = seqs[labels == b]
+
+    #case where the values are already equal
+    if a_counts == b_counts:
+        return seqs, labels
+
+    new_b_seqs_idx = np.random.choice(len(b_seqs), a_counts, replace=True)
+    new_b_seqs = [b_seqs[i] for i in new_b_seqs_idx]
+    new_b_labels = [b] * len(new_b_seqs_idx)
+    sampled_seqs = list(a_seqs) + new_b_seqs
+    sampled_labels = [a] * a_counts + new_b_labels
+    return sampled_seqs, sampled_labels
+
 
 def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
     """
@@ -41,4 +64,17 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
                 G -> [0, 0, 0, 1]
             Then, AGA -> [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0].
     """
-    pass
+    
+    alphabet = 'ATCG'
+    one_hot_seqs = []
+   
+    for seq in seq_arr:
+        
+        out = np.zeros((len(seq), len(alphabet)))
+        
+        for i, letter in enumerate(seq):
+            out[i, alphabet.index(letter)] = 1
+            
+        one_hot_seqs += [out]
+
+    return one_hot_seqs
