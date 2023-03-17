@@ -70,10 +70,10 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
    
     for seq in seq_arr:
         
-        out = np.zeros((len(seq), len(alphabet)))
+        out = np.zeros(len(seq) * len(alphabet))
         
         for i, letter in enumerate(seq):
-            out[i, alphabet.index(letter)] = 1
+            out[(i*4) + alphabet.index(letter)] = 1
             
         one_hot_seqs += [out]
 

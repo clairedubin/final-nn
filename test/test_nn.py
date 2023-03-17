@@ -211,10 +211,7 @@ def test_one_hot_encode_seqs():
 
     #check that a sequence is correctly one-hot encoded
     test_seq = ['GATC']
-    correct_one_hot = np.array([[0., 0., 0., 1.],
-            [1., 0., 0., 0.],
-            [0., 1., 0., 0.],
-            [0., 0., 1., 0.]])
+    correct_one_hot = np.array([0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0])
 
     one_hot_out = one_hot_encode_seqs(test_seq)[0]
     assert np.array_equal(one_hot_out, correct_one_hot), "One hot encoding function output doesn't match predicted output"
