@@ -160,9 +160,7 @@ class NeuralNetwork:
             # print()
             A_prev = A_curr
 
-
-        output = A_prev
-        return output, cache
+        return A_curr, cache
 
     def _single_backprop(
         self,
@@ -204,6 +202,8 @@ class NeuralNetwork:
             dZ = self._sigmoid_backprop(dA_curr, Z_curr)
         elif activation_curr == 'relu':
             dZ = self._relu_backprop(dA_curr, Z_curr)
+
+        # print('dZ:', dZ.shape)
 
         dA_prev = np.dot(dZ, W_curr)
         dW_curr = np.dot(dZ.T, A_prev) 
@@ -314,6 +314,11 @@ class NeuralNetwork:
 
         per_epoch_loss_train, per_epoch_loss_val = [], []
 
+        #add extra (empty) axis if y is 1-D
+        if len(y_train.shape) == 1:
+            y_train = y_train[:, np.newaxis]
+            y_val = y_val[:, np.newaxis]
+
         for epoch in range(self._epochs):
 
             # print('EPOCH {}'.format(epoch+1))
@@ -326,18 +331,15 @@ class NeuralNetwork:
             X_train_batched = np.array_split(X_train[order],batch_count)
             y_train_batched = np.array_split(y_train[order],batch_count)
 
-            batch_num = 0
             train_loss = []
-            for X_train_batch, y_train_batch in zip(X_train_batched, y_train_batched):
-                batch_num += 1
 
+            for X_train_batch, y_train_batch in zip(X_train_batched, y_train_batched):
                 y_hat, cache = self.forward(X_train_batch)
 
                 if self._loss_func == 'mse':
                     train_loss += [self._mean_squared_error(y_train_batch, y_hat)]
                 elif self._loss_func == 'log loss' or self._loss_func == 'binary_cross_entropy':
                     train_loss += [self._binary_cross_entropy(y_train_batch, y_hat)]
-
 
                 grad_dict = self.backprop(y_train_batch, y_hat, cache)
                 self._update_params(grad_dict)
@@ -347,11 +349,11 @@ class NeuralNetwork:
             ##VALIDATION
             y_hat = self.predict(X_val)
             if self._loss_func == 'mse':
-                val_loss = [self._mean_squared_error(y_val, y_hat)]
+                val_loss = self._mean_squared_error(y_val, y_hat)
             elif self._loss_func == 'log loss' or self._loss_func == 'binary_cross_entropy':
-                val_loss = [self._binary_cross_entropy(y_val, y_hat)]
+                val_loss = self._binary_cross_entropy(y_val, y_hat)
 
-            per_epoch_loss_val += [np.mean(val_loss)]
+            per_epoch_loss_val += [val_loss]
 
         return per_epoch_loss_train, per_epoch_loss_val
 
@@ -371,7 +373,6 @@ class NeuralNetwork:
         if not self._model_fit:
             warnings.warn('Warning: Model has not been fit! Run .fit to fit model before predicting.')
 
-
         y_hat, cache = self.forward(X)
         return y_hat
 
@@ -387,6 +388,8 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
+        #force float array to work with exp function
+        Z = Z.astype(float)
 
         nl_transform = 1 / (1 + np.exp(-Z))
         return nl_transform
