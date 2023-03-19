@@ -1,0 +1,21 @@
+[build-system]
+requires = [
+	"flit_core >=3.2,<4",
+	"python_version >= '3.7'"
+	]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "HW5"
+authors = [{name = "Claire Dubin", email = "claire.dubin@ucsf.edu"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+dependencies = [
+    "pytest"
+	"scikit-learn"
+]
+
+[project.urls]
+Home = "https://github.com/clairedubin/final-nn"

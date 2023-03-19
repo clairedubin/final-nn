@@ -1,3 +1,5 @@
+![BuildStatus](https://github.com/clairedubin/final-nn/actions/workflows/test.yml/badge.svg)
+
 # Final project: neural network
 
 ## Overview
